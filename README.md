@@ -4,7 +4,10 @@ __Author:__ Minh Le
 
 A portfolio project that simulates a **commercial loan underwriting workflow** using borrower-level credit data, **probability of default (PD)** modeling, underwriting decision rules, and **expected loss (EL)** estimation.
 
-The project combines a credit risk analysis notebook with a simple **Streamlit app** that helps evaluate borrower risk and support **Approve / Manual Review / Reject** decisions.
+The project combines a credit risk analysis notebook with a simple **Streamlit app** that helps evaluate borrower risk and support **Approve / Manual Review / Reject** decisions. Access the app [here](https://credit-risk-underwriting.streamlit.app/).
+
+<img width="1908" height="944" alt="image" src="https://github.com/user-attachments/assets/042e5b36-0327-4e96-b460-3dcdcb2f0b49" />
+
 
 ---
 

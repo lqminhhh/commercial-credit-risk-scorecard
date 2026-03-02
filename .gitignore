@@ -2,5 +2,3 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 .env
-*.pkl
-*.joblib

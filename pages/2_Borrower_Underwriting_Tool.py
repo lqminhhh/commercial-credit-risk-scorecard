@@ -6,12 +6,13 @@ from src.config import (
     LOAN_INTENT_OPTIONS,
     PRIOR_DEFAULT_OPTIONS,
 )
-from src.data_loader import load_model
+
+from src.data_loader import load_dataset
+from src.modeling import train_pd_model, predict_pd
 from src.feature_engineering import (
     prepare_borrower_features,
     get_model_feature_columns,
 )
-from src.modeling import predict_pd
 from src.underwriting import (
     assign_underwriting_decision,
     summarize_decision_reason,
@@ -44,8 +45,10 @@ st.info(
 
 
 @st.cache_resource
-def get_model():
-    return load_model("pd_model.pkl")
+def get_trained_model():
+    df_raw = load_dataset("credit_risk_dataset.csv")
+    model, metrics, _ = train_pd_model(df_raw)
+    return model, metrics
 
 
 def build_underwriting_summary(
@@ -95,13 +98,10 @@ def build_underwriting_summary(
     return summary
 
 
-# -----------------------------
-# Load model
-# -----------------------------
 try:
-    model = get_model()
+    model, model_metrics = get_trained_model()
 except Exception as e:
-    st.error(f"Unable to load model: {e}")
+    st.error(f"Unable to train model: {e}")
     st.stop()
 
 

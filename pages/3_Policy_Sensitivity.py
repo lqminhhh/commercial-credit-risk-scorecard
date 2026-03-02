@@ -1,8 +1,8 @@
 import streamlit as st
 from pathlib import Path
 from src.feature_engineering import prepare_borrower_features
-from src.data_loader import load_model
-from src.modeling import predict_pd
+from src.data_loader import load_dataset
+from src.modeling import train_pd_model, predict_pd
 from src.expected_loss import build_expected_loss_summary
 from src.utils import format_currency, format_pct
 
@@ -26,8 +26,10 @@ or loss assumptions are adjusted.
 
 
 @st.cache_resource
-def get_model():
-    return load_model("pd_model.pkl")
+def get_trained_model():
+    df_raw = load_dataset("credit_risk_dataset.csv")
+    model, metrics, _ = train_pd_model(df_raw)
+    return model, metrics
 
 
 def assign_custom_risk_tier(loan_to_income: float, low_cutoff: float, high_cutoff: float) -> str:
@@ -53,7 +55,7 @@ def assign_custom_decision(
 
 
 try:
-    model = get_model()
+    model, model_metrics = get_trained_model()
 except Exception as e:
     st.error(f"Unable to load model: {e}")
     st.stop()

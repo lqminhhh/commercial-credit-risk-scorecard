@@ -1,0 +1,39 @@
+/* General spacing */
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 1200px;
+}
+
+/* Titles */
+h1, h2, h3 {
+    letter-spacing: -0.02em;
+}
+
+/* Highlight cards for home page */
+.highlight-card {
+    background-color: #f7f9fc;
+    border: 1px solid #e6eaf1;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Metric containers feel a little cleaner */
+[data-testid="metric-container"] {
+    background-color: #fafafa;
+    border: 1px solid #eaeaea;
+    padding: 10px 14px;
+    border-radius: 12px;
+}
+
+/* Tables */
+[data-testid="stDataFrame"] {
+    border-radius: 10px;
+}
+
+/* Info / alert boxes */
+.stAlert {
+    border-radius: 12px;
+}

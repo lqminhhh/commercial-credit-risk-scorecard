@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from pathlib import Path
 
 
@@ -24,18 +25,71 @@ st.markdown(
 This application simulates a simplified **commercial loan underwriting workflow** using
 borrower-level credit data, underwriting rules, probability-of-default (PD) modeling,
 and expected loss estimation.
-
-It is designed as an educational decision-support tool that demonstrates how
-credit analysts can translate borrower information into practical lending decisions.
 """
 )
+st.info(
+    "Disclaimer: This app is an educational underwriting simulation and not a production lending system."
+)
+
+with st.expander("About the Dataset"):
+    st.markdown(
+        """
+This project uses a borrower-level credit risk dataset containing applicant financial,
+loan, and credit history information commonly used in underwriting analysis.
+
+The target variable is **`loan_status`**:
+- **0** = non-default
+- **1** = default
+"""
+    )
+
+    dataset_dict = pd.DataFrame(
+        {
+            "Feature Name": [
+                "person_age",
+                "person_income",
+                "person_home_ownership",
+                "person_emp_length",
+                "loan_intent",
+                "loan_grade",
+                "loan_amnt",
+                "loan_int_rate",
+                "loan_status",
+                "loan_percent_income",
+                "cb_person_default_on_file",
+                "cb_person_cred_hist_length",
+            ],
+            "Description": [
+                "Borrower age",
+                "Annual income",
+                "Home ownership status",
+                "Employment length (years)",
+                "Loan purpose",
+                "Loan grade",
+                "Loan amount",
+                "Interest rate",
+                "Loan outcome (0 = non-default, 1 = default)",
+                "Loan amount as a share of income",
+                "Historical default flag",
+                "Credit history length",
+            ],
+        }
+    )
+
+    st.dataframe(dataset_dict, use_container_width=True, hide_index=True)
+
+    st.markdown(
+        """
+**Source:** https://www.kaggle.com/datasets/laotse/credit-risk-dataset
+"""
+    )
 
 st.markdown("---")
 
 left, right = st.columns([1.2, 1])
 
 with left:
-    st.subheader("What this app covers")
+    st.subheader("What This App Covers")
     st.markdown(
         """
 - **Portfolio Overview**  
@@ -51,7 +105,7 @@ with left:
 """
     )
 
-    st.subheader("Business objective")
+    st.subheader("Business Objective")
     st.markdown(
         """
 The goal of this project is to simulate how a bank or finance team might:
@@ -68,7 +122,7 @@ with right:
         """
 <div class="highlight-card">
     <p><strong>Risk Metrics</strong><br>
-    Loan-to-Income, interest burden, PD, and Expected Loss</p>
+    Loan-to-Income, interest burden, probability-of-default (PD), and Expected Loss</p>
 </div>
 
 <div class="highlight-card">
@@ -86,7 +140,7 @@ with right:
 
 st.markdown("---")
 
-st.subheader("How to navigate")
+st.subheader("How To Navigate")
 st.markdown(
     """
 Use the **sidebar** to open:
@@ -94,8 +148,4 @@ Use the **sidebar** to open:
 2. **Borrower Underwriting Tool**
 3. **Policy Sensitivity**
 """
-)
-
-st.info(
-    "Disclaimer: This app is an educational underwriting simulation and not a production lending system."
 )

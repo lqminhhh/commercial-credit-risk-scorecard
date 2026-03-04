@@ -16,7 +16,7 @@ load_css()
 
 st.set_page_config(page_title="Policy Sensitivity", layout="wide")
 
-st.title("Policy Sensitivity / What-If Analysis")
+st.title("Policy Sensitivity / What-If Analysis 📈")
 st.markdown(
     """
 This page lets you test how underwriting decisions change when policy thresholds
@@ -24,6 +24,100 @@ or loss assumptions are adjusted.
 """
 )
 
+st.info(
+    "This app is an educational underwriting simulation and not a production lending system."
+)
+
+with st.expander("**Metrics Definitions**"):
+    st.markdown(
+        """
+### Loan-to-Income Ratio (LTI)
+**Formula:**  
+`LTI = loan amount / annual income`
+
+**What it means:**  
+LTI measures how large the requested loan is relative to borrower income. Higher LTI generally indicates greater repayment burden and higher underwriting risk.
+
+---
+
+### Prior Default Flag
+**Definition:**  
+This indicates whether the borrower has a historical default recorded in the dataset.
+
+- **Yes / 1** = prior default history is present  
+- **No / 0** = no prior default history is present  
+
+**Why it matters:**  
+Past default behavior is often an important warning signal in credit underwriting.
+
+---
+
+### Numeric Loan Grade
+**Definition:**  
+The original dataset includes letter-based loan grades that represent credit quality.
+
+- **A** = strongest credit quality / lower risk  
+- **B**
+- **C**
+- **D**
+- **E**
+- **F**
+- **G** = weakest credit quality / higher risk  
+
+For modeling purposes, these are converted into a numeric scale:
+
+- **A = 1**
+- **B = 2**
+- **C = 3**
+- **D = 4**
+- **E = 5**
+- **F = 6**
+- **G = 7**
+
+**Why it matters:**  
+A worse grade generally reflects weaker borrower credit quality and higher default risk.
+
+---
+
+### Interest Burden as % of Income
+**Formula:**  
+`Interest Burden % Income = (loan amount × interest rate) / annual income`
+
+**What it means:**  
+This approximates how much of borrower income is absorbed by annual interest cost. Higher values suggest greater affordability pressure.
+
+---
+
+### Risk Tier
+Borrowers are grouped into risk tiers using **Loan-to-Income Ratio (LTI)**:
+
+- **Low Risk:** LTI < **0.15**
+- **Medium Risk:** **0.15 ≤ LTI < 0.35**
+- **High Risk:** LTI ≥ **0.35**
+
+**Why it matters:**  
+This creates a simple underwriting segmentation that helps support approval, manual review, and rejection decisions.
+
+---
+
+### Expected Loss (EL)
+**Formula:**  
+`Expected Loss = PD × LGD × EAD`
+
+Where:
+- **PD** = Probability of Default  
+- **LGD** = Loss Given Default  
+- **EAD** = Exposure at Default  
+
+**How it is used in this app:**  
+- **PD** comes from the logistic regression model  
+- **LGD** is a fixed policy assumption (assumed to be **45%** across borrowers for demonstration purposes)
+- **EAD** is approximated using the loan amount  
+
+**What it means:**  
+Expected Loss estimates the average financial loss the lender would expect from a loan, combining both the chance of default and the size of potential loss.
+"""
+    )
 
 @st.cache_resource
 def get_trained_model():
@@ -145,14 +239,22 @@ with right:
             lgd=float(lgd),
         )
 
-        r1, r2, r3, r4 = st.columns(4)
-        r1.metric("Loan-to-Income", f"{loan_to_income:.2f}")
+        # -----------------------------
+        # Top metrics (2 per row)
+        # -----------------------------
+        r1, r2 = st.columns(2)
+        r1.metric("Loan-to-Income Ratio", f"{loan_to_income:.2f}")
         r2.metric("Predicted PD", format_pct(predicted_pd))
+
+        r3, r4 = st.columns(2)
         r3.metric("Risk Tier", custom_risk_tier)
         r4.metric("Decision", custom_decision)
 
         st.markdown("---")
 
+        # -----------------------------
+        # Supporting metrics
+        # -----------------------------
         s1, s2 = st.columns(2)
         s1.metric("Expected Loss", format_currency(el_summary["expected_loss"]))
         s2.metric("LGD Assumption", format_pct(lgd))

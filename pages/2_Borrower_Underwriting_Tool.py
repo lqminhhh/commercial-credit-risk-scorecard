@@ -30,7 +30,7 @@ load_css()
 
 st.set_page_config(page_title="Borrower Underwriting Tool", layout="wide")
 
-st.title("Borrower Underwriting Tool")
+st.title("Borrower Underwriting Tool 🛠")
 st.markdown(
     """
 This page simulates a simplified credit underwriting workflow.  
@@ -43,6 +43,96 @@ st.info(
     "This app is an educational underwriting simulation and not a production lending system."
 )
 
+with st.expander("**Metrics Definitions**"):
+    st.markdown(
+        """
+### Loan-to-Income Ratio (LTI)
+**Formula:**  
+`LTI = loan amount / annual income`
+
+**What it means:**  
+LTI measures how large the requested loan is relative to borrower income. Higher LTI generally indicates greater repayment burden and higher underwriting risk.
+
+---
+
+### Prior Default Flag
+**Definition:**  
+This indicates whether the borrower has a historical default recorded in the dataset.
+
+- **Yes / 1** = prior default history is present  
+- **No / 0** = no prior default history is present  
+
+**Why it matters:**  
+Past default behavior is often an important warning signal in credit underwriting.
+
+---
+
+### Numeric Loan Grade
+**Definition:**  
+The original dataset includes letter-based loan grades that represent credit quality.
+
+- **A** = strongest credit quality / lower risk  
+- **B**
+- **C**
+- **D**
+- **E**
+- **F**
+- **G** = weakest credit quality / higher risk  
+
+For modeling purposes, these are converted into a numeric scale:
+
+- **A = 1**
+- **B = 2**
+- **C = 3**
+- **D = 4**
+- **E = 5**
+- **F = 6**
+- **G = 7**
+
+**Why it matters:**  
+A worse grade generally reflects weaker borrower credit quality and higher default risk.
+
+---
+
+### Interest Burden as % of Income
+**Formula:**  
+`Interest Burden % Income = (loan amount × interest rate) / annual income`
+
+**What it means:**  
+This approximates how much of borrower income is absorbed by annual interest cost. Higher values suggest greater affordability pressure.
+
+---
+
+### Risk Tier
+Borrowers are grouped into risk tiers using **Loan-to-Income Ratio (LTI)**:
+
+- **Low Risk:** LTI < **0.15**
+- **Medium Risk:** **0.15 ≤ LTI < 0.35**
+- **High Risk:** LTI ≥ **0.35**
+
+**Why it matters:**  
+This creates a simple underwriting segmentation that helps support approval, manual review, and rejection decisions.
+
+---
+
+### Expected Loss (EL)
+**Formula:**  
+`Expected Loss = PD × LGD × EAD`
+
+Where:
+- **PD** = Probability of Default  
+- **LGD** = Loss Given Default  
+- **EAD** = Exposure at Default  
+
+**How it is used in this app:**  
+- **PD** comes from the logistic regression model  
+- **LGD** is a fixed policy assumption (assumed to be **45%** across borrowers for demonstration purposes)
+- **EAD** is approximated using the loan amount  
+
+**What it means:**  
+Expected Loss estimates the average financial loss the lender would expect from a loan, combining both the chance of default and the size of potential loss.
+"""
+    )
 
 @st.cache_resource
 def get_trained_model():
@@ -251,20 +341,25 @@ to generate:
             # -----------------------------
             # Top metrics
             # -----------------------------
-            m1, m2, m3, m4 = st.columns(4)
-            m1.metric("Loan-to-Income", f"{loan_to_income:.2f}")
+            # -----------------------------
+            m1, m2 = st.columns(2)
+            m1.metric("Loan-to-Income (LTI)", f"{loan_to_income:.2f}")
             m2.metric("Predicted PD", format_pct(predicted_pd))
+
+            m3, m4 = st.columns(2)
             m3.metric("Risk Tier", risk_tier)
             m4.metric("Decision", decision)
 
             st.markdown("---")
 
             # -----------------------------
-            # Supporting metrics
+            # Supporting metrics (2 per row)
             # -----------------------------
-            s1, s2, s3, s4 = st.columns(4)
+            s1, s2 = st.columns(2)
             s1.metric("Interest Burden % Income", format_pct(interest_burden))
             s2.metric("Expected Loss", format_currency(el_summary["expected_loss"]))
+
+            s3, s4 = st.columns(2)
             s3.metric("Loan Grade", loan_grade)
             s4.metric("Prior Default Flag", "Yes" if prior_default_flag == 1 else "No")
 
